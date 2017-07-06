@@ -1,6 +1,7 @@
 
 var Colors = {
 	red:0xf25346,
+	yellow:0xedeb27,
 	white:0xd8d0d1,
 	brown:0x59332e,
 	pink:0xF5986E,
@@ -245,6 +246,58 @@ Tree = function () {
 
 }
 
+Flower = function () {
+
+	this.mesh = new THREE.Object3D();
+
+	var geomStem = new THREE.BoxGeometry( 5,50,5,1,1,1 );
+	var matStem = new THREE.MeshPhongMaterial( { color:Colors.green, shading:THREE.FlatShading});
+	var stem = new THREE.Mesh(geomStem,matStem);
+	stem.castShadow = false;
+	stem.receiveShadow = true;
+	this.mesh.add(stem);
+
+
+	var geomPetalCore = new THREE.BoxGeometry(10,10,5,1,1,1);
+	var matPetalCore = new THREE.MeshPhongMaterial({color:Colors.yellow, shading:THREE.FlatShading});
+	petalCore = new THREE.Mesh(geomPetalCore, matPetalCore);
+	petalCore.castShadow = false;
+	petalCore.receiveShadow = true;
+
+	var petalColor = petalColors [Math.floor(Math.random()*3)];
+
+	var geomPetal = new THREE.BoxGeometry( 15,20,5,1,1,1 );
+	var matPetal = new THREE.MeshBasicMaterial( { color:petalColor});
+
+	petal1 = new THREE.Mesh(geomPetal,matPetal);
+	petal1.castShadow = false;
+	petal1.receiveShadow = true;
+	petal1.position.set(30,0,0);
+
+	petal2 = new THREE.Mesh(geomPetal,matPetal);
+	petal2.castShadow = false;
+	petal2.receiveShadow = true;
+	petal2.position.set(60,0,0);
+
+	petal3 = new THREE.Mesh(geomPetal,matPetal);
+	petal3.castShadow = false;
+	petal3.receiveShadow = true;
+	petal3.position.set(90,0,0);
+
+	petal4 = new THREE.Mesh(geomPetal,matPetal);
+	petal4.castShadow = false;
+	petal4.receiveShadow = true;
+	petal4.position.set(120,0,0);
+
+	petalCore.add(petal1, petal2, petal3, petal4);
+	petalCore.position.set(0,50,0);
+	this.mesh.add(petalCore);
+
+}
+
+var petalColors = [Colors.red, Colors.yellow, Colors.blue];
+
+
 
 Forest = function(){
 
@@ -284,6 +337,33 @@ Forest = function(){
 
 		this.mesh.add(t.mesh);
 	}
+
+	// Number of Trees
+	this.nFlowers = 50;
+
+	var stepAngle = Math.PI*2 / this.nFlowers;
+
+
+	for(var i=0; i<this.nFlowers; i++){	
+
+		var f = new Flower();
+		var a = stepAngle*i;
+
+		var h = 605;
+		f.mesh.position.y = Math.sin(a)*h;
+		f.mesh.position.x = Math.cos(a)*h;		
+
+		f.mesh.rotation.z = a + (Math.PI/2)*3;
+
+		f.mesh.position.z = 0-Math.random()*600;
+
+		var s = .1+Math.random()*.3;
+		f.mesh.scale.set(s,s,s);
+
+		this.mesh.add(f.mesh);
+	}
+
+
 }
 
 
