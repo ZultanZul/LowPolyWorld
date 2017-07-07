@@ -422,28 +422,28 @@ var AirPlane = function() {
 	this.mesh.add(this.propeller);
 }
 
-var moon;
+// var moon;
 
-var mtlLoader = new THREE.MTLLoader();
-mtlLoader.setPath( 'models/' );
-mtlLoader.load( 'LowPolyPlanet.mtl', function( materials ) {
+// var mtlLoader = new THREE.MTLLoader();
+// mtlLoader.setPath( 'models/' );
+// mtlLoader.load( 'LowPolyPlanet.mtl', function( materials ) {
 
-	materials.preload();
+// 	materials.preload();
 
-	var objLoader = new THREE.OBJLoader();
-	objLoader.setMaterials( materials );
-	objLoader.setPath( 'models/' );
-	objLoader.load( 'LowPolyPlanet.obj', function ( object ) {
+// 	var objLoader = new THREE.OBJLoader();
+// 	objLoader.setMaterials( materials );
+// 	objLoader.setPath( 'models/' );
+// 	objLoader.load( 'LowPolyPlanet.obj', function ( object ) {
 
-		moon = object;
-		moon.position.z=-600;
-		moon.position.y=900;
-		moon.scale.set(.4,.4,.4);
-		orbit.mesh.add(moon);
+// 		moon = object;
+// 		moon.position.z=-600;
+// 		moon.position.y=900;
+// 		moon.scale.set(.4,.4,.4);
+// 		orbit.mesh.add(moon);
 
-	});
+// 	});
 
-});
+// });
 
 var sky;
 var forest;
@@ -496,7 +496,7 @@ function loop(){
   sky.mesh.rotation.z += .003;
   forest.mesh.rotation.z += .005;
   airplane.propeller.rotation.x += 0.3;
-  if (!!moon) moon.rotation.y += 0.005;
+  // if (!!moon) moon.rotation.y += 0.005;
   renderer.render(scene, camera);
   requestAnimationFrame(loop);
 }
