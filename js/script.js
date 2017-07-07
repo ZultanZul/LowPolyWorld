@@ -105,26 +105,6 @@ function createLights(){
 }	
 
 
-// Sea = function(){
-// 	var geom = new THREE.CylinderGeometry(600,600,1500,40,10);
-// 	//rotate on the x axis
-// 	geom.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI/2));
-// 	//create a material
-// 	// var mat = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-
-// 	var mat = new THREE.MeshPhongMaterial({
-// 		color: Colors.green,
-// 		transparent:true,
-// 		opacity: .6,
-// 		shading:THREE.FlatShading,
-// 	});
-
-// 	//create a mesh of the object
-// 	this.mesh = new THREE.Mesh(geom, mat);
-// 	//receive shadows
-// 	this.mesh.receiveShadow = true;
-// }
-
 Land = function(){
 	var geom = new THREE.CylinderGeometry(600,600,1700,40,10);
 	//rotate on the x axis
@@ -139,6 +119,14 @@ Land = function(){
 	this.mesh = new THREE.Mesh(geom, mat);
 	//receive shadows
 	this.mesh.receiveShadow = true;
+}
+
+Orbit = function(){
+
+	var geom =new THREE.Object3D();
+
+	this.mesh = geom;
+
 }
 
 Cloud = function(){
@@ -258,7 +246,7 @@ Flower = function () {
 	this.mesh.add(stem);
 
 
-	var geomPetalCore = new THREE.BoxGeometry(10,10,5,1,1,1);
+	var geomPetalCore = new THREE.BoxGeometry(10,10,10,1,1,1);
 	var matPetalCore = new THREE.MeshPhongMaterial({color:Colors.yellow, shading:THREE.FlatShading});
 	petalCore = new THREE.Mesh(geomPetalCore, matPetalCore);
 	petalCore.castShadow = false;
@@ -268,29 +256,24 @@ Flower = function () {
 
 	var geomPetal = new THREE.BoxGeometry( 15,20,5,1,1,1 );
 	var matPetal = new THREE.MeshBasicMaterial( { color:petalColor});
+	geomPetal.vertices[5].y-=4;
+	geomPetal.vertices[4].y-=4;
+	geomPetal.vertices[7].y+=4;
+	geomPetal.vertices[6].y+=4;
+	geomPetal.translate(12.5,0,3);
 
-	petal1 = new THREE.Mesh(geomPetal,matPetal);
-	petal1.castShadow = false;
-	petal1.receiveShadow = true;
-	petal1.position.set(30,0,0);
+		var petals = [];
+		for(var i=0; i<4; i++){	
 
-	petal2 = new THREE.Mesh(geomPetal,matPetal);
-	petal2.castShadow = false;
-	petal2.receiveShadow = true;
-	petal2.position.set(60,0,0);
+			petals[i]=new THREE.Mesh(geomPetal,matPetal);
+			petals[i].rotation.z = i*Math.PI/2;
+			petals[i].castShadow = true;
+			petals[i].receiveShadow = true;
+		}
 
-	petal3 = new THREE.Mesh(geomPetal,matPetal);
-	petal3.castShadow = false;
-	petal3.receiveShadow = true;
-	petal3.position.set(90,0,0);
-
-	petal4 = new THREE.Mesh(geomPetal,matPetal);
-	petal4.castShadow = false;
-	petal4.receiveShadow = true;
-	petal4.position.set(120,0,0);
-
-	petalCore.add(petal1, petal2, petal3, petal4);
-	petalCore.position.set(0,50,0);
+	petalCore.add(petals[0],petals[1],petals[2],petals[3]);
+	petalCore.position.y = 25;
+	petalCore.position.z = 3;
 	this.mesh.add(petalCore);
 
 }
@@ -339,7 +322,7 @@ Forest = function(){
 	}
 
 	// Number of Trees
-	this.nFlowers = 50;
+	this.nFlowers = 350;
 
 	var stepAngle = Math.PI*2 / this.nFlowers;
 
@@ -363,9 +346,7 @@ Forest = function(){
 		this.mesh.add(f.mesh);
 	}
 
-
 }
-
 
 var AirPlane = function() {
 	
@@ -441,14 +422,33 @@ var AirPlane = function() {
 	this.mesh.add(this.propeller);
 }
 
+var moon;
 
+var mtlLoader = new THREE.MTLLoader();
+mtlLoader.setPath( 'models/' );
+mtlLoader.load( 'LowPolyPlanet.mtl', function( materials ) {
 
-// Put the sea object into the scene.
+	materials.preload();
 
+	var objLoader = new THREE.OBJLoader();
+	objLoader.setMaterials( materials );
+	objLoader.setPath( 'models/' );
+	objLoader.load( 'LowPolyPlanet.obj', function ( object ) {
+
+		moon = object;
+		moon.position.z=-600;
+		moon.position.y=900;
+		moon.scale.set(.4,.4,.4);
+		orbit.mesh.add(moon);
+
+	});
+
+});
 
 var sky;
 var forest;
 var land;
+var orbit;
 var airplane;
 
 // var sea;
@@ -461,11 +461,7 @@ function createSky(){
   scene.add(sky.mesh);
 }
 
-// function createSea(){
-//   sea = new Sea();
-//   sea.mesh.position.y = -600;
-//   scene.add(sea.mesh);
-// }
+
 
 function createLand(){
   land = new Land();
@@ -473,6 +469,12 @@ function createLand(){
   scene.add(land.mesh);
 }
 
+function createOrbit(){
+  orbit = new Orbit();
+  orbit.mesh.position.y = offSet;
+  orbit.mesh.rotation.z = -Math.PI/6; 
+  scene.add(orbit.mesh);
+}
 
 function createForest(){
   forest = new Forest();
@@ -490,9 +492,11 @@ function createPlane(){
 
 function loop(){
   land.mesh.rotation.z += .005;
+  orbit.mesh.rotation.z += .001;
   sky.mesh.rotation.z += .003;
   forest.mesh.rotation.z += .005;
   airplane.propeller.rotation.x += 0.3;
+  if (!!moon) moon.rotation.y += 0.005;
   renderer.render(scene, camera);
   requestAnimationFrame(loop);
 }
@@ -503,8 +507,7 @@ function init() {
 	createScene();
 	createLights();
 	createPlane();
-
-	// createSea();
+	createOrbit();
 	createLand();
 	createForest();
 	createSky();
